@@ -1,16 +1,21 @@
-import dotenv from 'dotenv';
 import express from 'express';
+import { iocInit } from './iocInit';
+import { InversifyExpressServer } from 'inversify-express-utils';
 
-dotenv.config();
+const container = iocInit();
 
-const PORT = process.env.PORT || 3000;
-
-const app = express();
-
-app.get('/hello', (req, res) => {
-  res.send('Hello');
+const server = new InversifyExpressServer(container);
+server.setConfig((app) => {
+  app.use(
+    express.urlencoded({
+      extended: true,
+    }),
+  );
+  app.use(express.json());
 });
 
-app.listen(PORT, () => {
-  console.log(`Server start at port ${PORT}`);
+const app = server.build();
+
+app.listen(3000, () => {
+  console.log(`Application started successfully on port ${3000}.`);
 });
